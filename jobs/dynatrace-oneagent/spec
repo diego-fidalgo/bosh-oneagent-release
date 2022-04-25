@@ -36,6 +36,12 @@ properties:
   dynatrace.hostgroup:
     description: 'Provide a hostgroup name for your CF deployment'
     default: ''
+  dynatrace.automatic_hostgroup:
+    description: 'Set automatically the BOSH Deployment name as hostgroup name. If set to true, it overrides given hostgroup'
+    default: false
+  dynatrace.hostgroup_prefix:
+    description: 'Set a prefix for the hostgroup value'
+    default: ''
   dynatrace.hosttags:
     description: 'Host tags for this VM. Format like DT_TAGS ENV variable: single line, space separated pairs of <key>=<value>'
     default: ''
@@ -51,7 +57,7 @@ properties:
     description: 'Enable validation of the download via certificate'
     default: 'false'
   dynatrace.installerargs:
-    description: 'Arguments to hand over to the Dynatrace OneAgent installer'
+    description: 'Arguments to hand over to the Dynatrace OneAgent installer. If set, some vars from above are overriden'
     default: ''
   dynatrace.injectionrules:
     description: 'DT_INJECTION_RULES'

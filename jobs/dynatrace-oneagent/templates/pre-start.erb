@@ -20,6 +20,8 @@ export CFG_APP_LOG_CONTENT_ACCESS="<%= p("dynatrace.applogaccess") %>"
 # shellcheck disable=SC2140
 export CFG_HOST_GROUP="<%= p("dynatrace.hostgroup") %>"
 # shellcheck disable=SC2140
+export CFG_HOST_GROUP_PREFIX="<%= p("dynatrace.hostgroup_prefix") %>"
+# shellcheck disable=SC2140
 export CFG_HOST_TAGS="<%= p("dynatrace.hosttags") %>"
 # shellcheck disable=SC2140
 export CFG_HOST_PROPS="<%= p("dynatrace.hostprops") %> BOSHReleaseVersion=<%= spec.release.version %>"
@@ -71,9 +73,14 @@ if [[ -z "$CFG_INSTALLERARGS" ]]; then
         CFG_INSTALLERARGS="$CFG_INSTALLERARGS --set-app-log-content-access=$CFG_APP_LOG_CONTENT_ACCESS"
     fi
 
+    <% if p('dynatrace.automatic_hostgroup') %>
+    CFG_HOST_GROUP="<%= spec.deployment %>"
+    <% end %>
+    
+
     if [[ "$CFG_HOST_GROUP" != "" ]]; then
-        installLog "Setting host group to ${CFG_HOST_GROUP}"
-        INSTALLERARGS="$CFG_INSTALLERARGS --set-host-group=$CFG_HOST_GROUP"
+        installLog "Setting host group to ${CFG_HOST_GROUP_PREFIX}${CFG_HOST_GROUP}"
+        INSTALLERARGS="$CFG_INSTALLERARGS --set-host-group=${CFG_HOST_GROUP_PREFIX}${CFG_HOST_GROUP}"
     fi
 
     if [[ "$CFG_INFRA_ONLY" == "1" ]]; then
@@ -87,6 +94,10 @@ else
         installLog "Enabling log monitoring"
         INSTALLERARGS="$CFG_INSTALLERARGS --set-app-log-content-access=1"
     fi
+    
+    <% if p('dynatrace.automatic_hostgroup') %>
+    INSTALLERARGS=$(echo "$INSTALLERARGS" | sed 's/HOST_GROUP=[a-zA-Z0-9_-]*/HOST_GROUP='${CFG_HOST_GROUP_PREFIX}${CFG_HOST_GROUP}'/')
+    <% end %>
 fi
 
 # set downloadurl to fallback if not given
